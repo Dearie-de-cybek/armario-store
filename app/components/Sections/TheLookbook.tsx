@@ -5,11 +5,11 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const lookbookImages = [
-  "https://images.unsplash.com/photo-1550614000-4b95d4ebf5eb?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1617137984086-4c40594ba32d?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1507680434567-5739c80be1ac?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1512413914565-d72b528b7886?q=80&w=800&auto=format&fit=crop",
+  "images/look.jpg",
+  "images/look1.jpg",
+  "images/look2.jpg",
+  "images/look3.jpg",
+  "images/a1.jpg",
 ];
 
 export default function TheLookbook() {
