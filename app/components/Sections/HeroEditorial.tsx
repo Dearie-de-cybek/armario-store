@@ -2,123 +2,156 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function HeroEditorial() {
   const sectionRef = useRef<HTMLElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
   const maskRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const subtextRef = useRef<HTMLParagraphElement>(null);
+  const buttonsRef = useRef<HTMLDivElement>(null);
+  const signatureRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline();
+      // 1. Initial States (Hidden & Shifted)
+      // Vertical mask starting hidden at the bottom
+      gsap.set(maskRef.current, { clipPath: "inset(100% 0% 0% 0%)" }); 
+      gsap.set(imageRef.current, { scale: 1.05 });
+      gsap.set([headlineRef.current, subtextRef.current, signatureRef.current], { y: 20, opacity: 0 });
+      gsap.set(buttonsRef.current, { opacity: 0 }); // Buttons only fade, no Y movement
 
-      // 1. Initial States
-      gsap.set(maskRef.current, { clipPath: "inset(100% 0% 0% 0%)" }); // Hidden at the bottom
-      gsap.set(imageRef.current, { scale: 1.05 }); // Pre-scaled for the ultra-slow zoom out
-      
-      // Text elements initial state
-      const textElements = contentRef.current?.children;
-      if (textElements) {
-        gsap.set(textElements, { y: 30, opacity: 0 });
-      }
-
-      // 2. The Reveal Sequence
-      tl.to(maskRef.current, {
+      // 2. The Cinematic Reveal Sequence
+      // Image Mask Reveal
+      gsap.to(maskRef.current, {
         clipPath: "inset(0% 0% 0% 0%)",
-        duration: 1.6,
-        ease: "power3.inOut",
-      })
-      .to(imageRef.current, {
+        duration: 1.2,
+        ease: "power2.out",
+      });
+
+      // Ultra-slow Image Breathing (12 seconds)
+      gsap.to(imageRef.current, {
         scale: 1,
-        duration: 12, // The 12-second luxury breathing effect
-        ease: "none", // Linear movement feels like a slow camera dolly
-      }, "-=1.6") // Start right as the mask starts revealing
-      .to(textElements as HTMLCollection, {
+        duration: 12,
+        ease: "power1.out",
+      });
+
+      // Headline (Fade + Up)
+      gsap.to(headlineRef.current, {
         y: 0,
         opacity: 1,
         duration: 1.2,
-        stagger: 0.15,
+        delay: 0.4,
         ease: "power2.out",
-      }, "-=11.0"); // Fade text in shortly after the image is revealed
+      });
+
+      // Subtext (Fade + Up)
+      gsap.to(subtextRef.current, {
+        y: 0,
+        opacity: 1,
+        duration: 1.2,
+        delay: 0.6,
+        ease: "power2.out",
+      });
+
+      // Buttons (Soft Fade-in Only)
+      gsap.to(buttonsRef.current, {
+        opacity: 1,
+        duration: 1,
+        delay: 0.8,
+        ease: "power1.inOut", 
+      });
+
+      // Signature
+      gsap.to(signatureRef.current, {
+        y: 0,
+        opacity: 1,
+        duration: 1.2,
+        delay: 1.0,
+        ease: "power2.out",
+      });
+
+      // 3. Very Subtle Scroll Parallax (5-8% movement)
+      gsap.to(imageRef.current, {
+        yPercent: 8, 
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        }
+      });
 
     }, sectionRef);
 
-    // 3. The 1-2px Cursor Hover Parallax
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!imageRef.current) return;
-      const { clientX, clientY } = e;
-      const xPos = (clientX / window.innerWidth - 0.5) * 4; // Max 2px movement left/right
-      const yPos = (clientY / window.innerHeight - 0.5) * 4; // Max 2px movement up/down
-
-      gsap.to(imageRef.current, {
-        x: xPos,
-        y: yPos,
-        duration: 1.5, // Slow, syrupy follow
-        ease: "power2.out",
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      ctx.revert();
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
     <section 
       ref={sectionRef} 
-      className="relative w-full h-screen flex items-center overflow-hidden bg-[var(--color-background)]"
+      className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-[#141210]"
     >
-      {/* Background Image with Mask Reveal */}
-      <div 
-        ref={maskRef} 
-        className="absolute inset-0 w-full h-full z-0 overflow-hidden"
-      >
+      {/* Background Image Wrapper with Vertical Mask Reveal */}
+      <div ref={maskRef} className="absolute inset-0 w-full h-full z-0 overflow-hidden">
         <img
           ref={imageRef}
-          src="https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?q=80&w=2000&auto=format&fit=crop" // Replace with actual Armario campaign shot
-          alt="Armario Campaign - Lagos"
-          className="object-cover w-full h-full object-center"
+          src="/images/armario1.jpg"
+          alt="Armario - Built for the Everyday Classic"
+          /* Using h-[110%] and top-[-5%] gives the parallax room to move down without revealing the background.
+             Added contrast-90 and sepia-[.15] to slightly flatten the blacks and warm the image, mimicking 35mm film stock.
+          */
+          className="absolute top-[-5%] left-0 w-full h-[110%] object-cover object-top contrast-90 sepia-[.15]" 
         />
-        {/* Soft gradient shadow for text readability (Darker on the left where text sits) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0C]/80 via-[#0B0B0C]/30 to-transparent"></div>
+        
+        {/* The Exact Strict Dark/Warm Overlay */}
+        <div 
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ background: "linear-gradient(to bottom, rgba(20,18,16,0.15), rgba(20,18,16,0.45))" }}
+        ></div>
       </div>
 
-      {/* Foreground Content (Left-aligned editorial layout) */}
-      <div 
-        ref={contentRef} 
-        className="relative z-10 flex flex-col justify-center px-6 md:px-12 lg:px-24 w-full max-w-7xl h-full mt-10"
-      >
-        <h1 className="text-[var(--color-background)] font-serif text-6xl md:text-8xl lg:text-[7rem] tracking-tight leading-[0.9] mb-6 max-w-3xl">
-          Armario — <br/>
-          Built for <br/>
-          Men Who Know.
+      {/* Foreground Editorial Content */}
+      <div className="relative z-10 flex flex-col items-center text-center px-6 w-full max-w-4xl mt-12">
+        
+        {/* Generous spacing, lighter font weight, pure #F2EEE8 */}
+        <h1 
+          ref={headlineRef}
+          className="text-[#F2EEE8] font-serif font-normal text-4xl md:text-6xl lg:text-[5rem] tracking-wide leading-[1.1] mb-10"
+        >
+          Built for the <br className="hidden md:block" /> Everyday Classic.
         </h1>
         
-        <p className="text-[var(--color-background)]/80 font-sans text-xs md:text-sm tracking-[0.2em] uppercase max-w-md mb-12 leading-loose">
-          Lagos craftsmanship. Worldwide delivery. <br/>
-          Elevated menswear curated for presence.
+        <p 
+          ref={subtextRef}
+          className="text-[#F2EEE8]/80 font-sans font-light text-sm md:text-base tracking-[0.2em] uppercase mb-14 leading-relaxed"
+        >
+          Modern menswear shaped by timeless taste.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-5 items-start mb-16">
-          <button className="px-10 py-4 bg-[var(--color-background)] text-[var(--color-foreground)] font-sans text-xs uppercase tracking-widest transition-transform duration-700 hover:scale-[1.02]">
-            Shop New Arrivals
+        <div ref={buttonsRef} className="flex flex-col sm:flex-row gap-6 items-center">
+          <button className="px-12 py-4 bg-[#F2EEE8] text-[#141210] font-sans font-light text-xs uppercase tracking-widest transition-opacity duration-700 hover:opacity-80">
+            Shop Collection
           </button>
           
-          <button className="px-10 py-4 border border-[var(--color-background)]/30 text-[var(--color-background)] font-sans text-xs uppercase tracking-widest backdrop-blur-sm transition-all duration-700 hover:bg-[var(--color-background)] hover:text-[var(--color-foreground)] hover:border-transparent">
-            WhatsApp Order
+          <button className="px-12 py-4 border border-[#F2EEE8]/40 text-[#F2EEE8] font-sans font-light text-xs uppercase tracking-widest backdrop-blur-sm transition-colors duration-700 hover:bg-[#F2EEE8]/10 hover:border-[#F2EEE8]/60">
+            Visit the Store
           </button>
         </div>
+      </div>
 
-        {/* Small signature line anchored at the bottom */}
-        <div className="absolute bottom-10 left-6 md:left-12 lg:left-24">
-          <p className="text-[var(--color-background)]/50 font-sans text-[10px] italic tracking-widest">
-            my broooo — step in right.
-          </p>
-        </div>
+      {/* Absolute positioned signature line for breathing room */}
+      <div className="absolute bottom-12 md:bottom-16 w-full flex justify-center z-10 pointer-events-none">
+        <p 
+          ref={signatureRef}
+          className="text-[#F2EEE8]/60 font-serif italic text-sm md:text-base tracking-wide"
+        >
+          my broooo — keep it classic.
+        </p>
       </div>
     </section>
   );

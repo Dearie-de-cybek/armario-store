@@ -4,10 +4,10 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const products = [
-  { id: 1, name: "Signature Linen Suit", priceNGN: "₦185,000", priceUSD: "$120", img: "https://images.unsplash.com/photo-1593032465175-481ac7f401a0?q=80&w=800&auto=format&fit=crop" },
-  { id: 2, name: "The Lekki Overshirt", priceNGN: "₦65,000", priceUSD: "$45", img: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=800&auto=format&fit=crop" },
-  { id: 3, name: "Tailored Pleated Trouser", priceNGN: "₦80,000", priceUSD: "$55", img: "https://images.unsplash.com/photo-1624378439575-d1ead6bb1651?q=80&w=800&auto=format&fit=crop" },
+const rotations = [
+  { id: "01", title: "Clean Layers", img: "images/a3.jpg" },
+  { id: "02", title: "Denim Balance", img: "images/a1.jpg" },
+  { id: "03", title: "Weekend Classic", img: "images/a4.jpg" },
 ];
 
 export default function TheRotation() {
@@ -15,15 +15,16 @@ export default function TheRotation() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    
     const ctx = gsap.context(() => {
-      const cards = gsap.utils.toArray<HTMLDivElement>(".product-card");
+      const cards = gsap.utils.toArray<HTMLDivElement>(".rotation-card");
       
       gsap.fromTo(cards,
-        { y: 40, opacity: 0 },
+        { y: 60, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 1,
+          duration: 1.2,
           stagger: 0.15,
           ease: "power2.out",
           scrollTrigger: {
@@ -33,54 +34,57 @@ export default function TheRotation() {
         }
       );
     }, sectionRef);
+
     return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="w-full bg-[var(--color-background)] py-24 px-6 md:px-12 lg:px-24">
+    <section ref={sectionRef} className="w-full bg-[var(--color-background)] py-24 md:py-32 px-6 md:px-12 lg:px-24">
       {/* Section Header */}
-      <div className="flex flex-col items-center mb-16 text-center">
-        <h2 className="font-serif text-3xl md:text-4xl uppercase tracking-widest mb-4">The Rotation</h2>
-        <p className="font-sans text-xs uppercase tracking-[0.2em] opacity-50 max-w-md">
-          Our most requested silhouettes. No restocks once gone, my broooo.
+      <div className="mb-16 md:mb-24 flex flex-col md:flex-row justify-between items-end border-b border-[var(--color-foreground)]/10 pb-6">
+        <h2 className="font-serif text-3xl md:text-4xl tracking-wide text-[var(--color-foreground)]">
+          Daily Rotation
+        </h2>
+        <p className="font-sans text-xs uppercase tracking-widest text-[var(--color-foreground)]/60 mt-4 md:mt-0">
+          How we wear it now.
         </p>
       </div>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-        {products.map((product) => (
-          <div key={product.id} className="product-card group cursor-pointer">
-            {/* Image Container with Hover Quick Add */}
-            <div className="relative w-full aspect-[4/5] bg-[var(--color-foreground)]/5 overflow-hidden mb-6">
-              <img 
-                src={product.img} 
-                alt={product.name} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              {/* Quick Add overlay */}
-              <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full transition-transform duration-500 ease-out group-hover:translate-y-0">
-                <button className="w-full bg-[var(--color-background)] text-[var(--color-foreground)] font-sans text-[10px] uppercase tracking-widest py-3 hover:bg-[var(--color-foreground)] hover:text-[var(--color-background)] transition-colors">
-                  Quick Add +
-                </button>
+      {/* Rotation Layout (Magazine Spread) */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-6">
+        {rotations.map((item, index) => {
+          // Creating an asymmetric layout natively in Tailwind
+          const spanClass = index === 0 ? "md:col-span-5" : index === 1 ? "md:col-span-3 md:mt-24" : "md:col-span-4";
+          
+          return (
+            <div key={item.id} className={`rotation-card group cursor-pointer ${spanClass} flex flex-col`}>
+              {/* Image Container */}
+              <div className="relative w-full aspect-[3/4] overflow-hidden bg-[var(--color-foreground)]/5 mb-6">
+                <img 
+                  src={item.img} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.03]"
+                />
+              </div>
+
+              {/* Minimal Text Block */}
+              <div className="flex flex-col">
+                <p className="font-sans text-[10px] uppercase tracking-widest text-[var(--color-foreground)]/50 mb-2">
+                  Rotation {item.id}
+                </p>
+                <div className="flex justify-between items-center">
+                  <h3 className="font-serif text-lg md:text-xl text-[var(--color-foreground)]">
+                    {item.title}
+                  </h3>
+                  {/* Subtle Hover CTA */}
+                  <span className="font-sans text-xs tracking-widest text-[var(--color-foreground)] opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+                    Shop Look →
+                  </span>
+                </div>
               </div>
             </div>
-
-            {/* Product Meta */}
-            <div className="flex justify-between items-start">
-              <h3 className="font-sans text-sm md:text-base tracking-wide">{product.name}</h3>
-              <div className="text-right">
-                <p className="font-sans text-sm">{product.priceNGN}</p>
-                <p className="font-sans text-[10px] opacity-50 tracking-widest">{product.priceUSD}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-20 flex justify-center">
-        <button className="border-b border-[var(--color-foreground)] pb-1 font-sans text-xs uppercase tracking-[0.2em] hover:opacity-50 transition-opacity">
-          View All Ready-To-Wear
-        </button>
+          );
+        })}
       </div>
     </section>
   );

@@ -55,7 +55,7 @@ export default function LekkiRoom() {
       <div className="w-full md:w-1/2 h-[50vh] md:h-auto relative overflow-hidden bg-black">
         <img 
           ref={imageRef}
-          src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1200&auto=format&fit=crop" // Replace with moody Lekki store photo
+          src="images/walkin.webp" // Replace with moody Lekki store photo
           alt="The Lekki Room - Armario Physical Store"
           className="absolute top-[-10%] left-0 w-full h-[120%] object-cover opacity-80"
         />

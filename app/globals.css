@@ -1,13 +1,10 @@
 @import "tailwindcss";
 
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
 @theme {
   /* Colors */
-  --color-background: #F6F2EA;
-  --color-foreground: #0B0B0C;
-  --color-accent: #8C7A62;
+ --color-background: #F9F8F6; 
+  --color-foreground: #2A2A28;
+  --color-accent: #A39B8E;
 
   /* Typography mapping to our Next.js fonts */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
